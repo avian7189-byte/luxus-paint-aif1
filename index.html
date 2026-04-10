@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUXUSPAINT 報名系統</title>
+  
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    fbq('init', '你的PIXEL辨識碼'); // ⚠️ 填入 FB Pixel ID
+    fbq('track', 'PageView');
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <style>
+    :root { --bg-color: #121212; --card-bg: #1a1a1a; --gold: #c5a059; --text-main: #FFFFFF; }
+    body { background-color: var(--bg-color); color: var(--text-main); font-family: "Noto Sans TC", sans-serif; padding: 20px 0; }
+    .main-card { max-width: 600px; margin: auto; border: 1px solid #333; border-radius: 24px; background-color: var(--card-bg); box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; }
+    .brand-header { background: #000; padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--gold); font-size: 1.8rem; font-weight: 900; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; }
+    .form-label { font-weight: 500; color: var(--gold); margin-top: 15px; }
+    .form-control, .form-select { background-color: #252525 !important; border: 1px solid #444; color: #FFFFFF !important; padding: 12px; border-radius: 10px; }
+    .pricing-container { background: linear-gradient(145deg, #222 0%, #111 100%); border: 1.5px solid var(--gold); border-radius: 16px; padding: 15px 20px; margin: 25px 0; transition: 0.3s; }
+    .price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; color: #FFFFFF; }
+    .price-tag { color: var(--gold); font-weight: 900; font-size: 1.3rem; }
+    .bank-box { background-color: #000; border: 1px solid var(--gold); border-radius: 15px; padding: 15px; margin: 10px 0 20px 0; transition: 0.3s; }
+    .btn-submit { background: linear-gradient(45deg, #8e6d31 0%, #c5a059 100%); color: #000; border: none; padding: 18px; font-size: 1.2rem; font-weight: 800; width: 100%; border-radius: 12px; margin-top: 10px; cursor: pointer; }
+    .btn-submit:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+    .loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+  </style>
+</head>
+<body>
+
+<div id="loading" class="loading-overlay">
+  <div class="spinner-border" style="color: var(--gold);"></div>
+  <p class="mt-3" style="color: var(--gold);">資料安全傳輸中...</p>
+</div>
+
+<div class="container">
+  <div class="card main-card">
+    <div id="formSection">
+      <div class="brand-header">Luxus paint</div>
+      <div class="card-body p-4 p-md-5">
+        <form id="luxusForm">
+          <div class="mb-3"><label class="form-label">公司名稱</label><input type="text" name="company" class="form-control" required></div>
+          <div class="row">
+            <div class="col-md-6 mb-3"><label class="form-label">姓名</label><input type="text" name="name" class="form-control" required></div>
+            <div class="col-md-6 mb-3"><label class="form-label">電話</label><input type="tel" name="phone" class="form-control" required></div>
+          </div>
+          <div class="mb-3"><label class="form-label">LINE ID</label><input type="text" name="line" class="form-control" required></div>
+          <div class="mb-3">
+            <label class="form-label">參與地區</label>
+            <select id="location" name="location" class="form-select" required>
+              <option value="" disabled selected>名額讀取中...</option>
+              <option value="高雄漢來飯店">高雄漢來飯店</option>
+              <option value="台中新天地餐廳">台中新天地餐廳</option>
+              <option value="台北格萊天漾大飯店">台北格萊天漾大飯店</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">專屬優惠碼</label><input type="text" id="promoCode" name="promoCode" class="form-control" placeholder="若無則免填" oninput="toggleLogic()"></div>
+
+          <div id="priceSection" class="pricing-container">
+            <div class="price-row"><span>獨行探索者</span><span class="price-tag">$599 / 人</span></div>
+            <div class="price-row"><span>靈魂伴侶價</span><span class="price-tag">$1,000 / 2人</span></div>
+          </div>
+
+          <div id="bankLabel" class="form-label">匯款資訊</div>
+          <div id="bankArea" class="bank-box">
+            <div class="text-white small">玉山銀行 (808) 仁德分行<br>帳號：<strong style="color:var(--gold)">1137-940-267329</strong></div>
+          </div>
+          
+          <div id="bankIdGroup" class="mb-3">
+            <label class="form-label">匯款後五碼</label>
+            <input type="text" id="bankId" name="bankId" class="form-control" maxlength="5" placeholder="輸入五碼數字" oninput="toggleLogic()">
+          </div>
+          
+          <div class="mb-4"><label class="form-label">報名人數</label><input type="number" id="count" name="count" class="form-control" min="1" value="1" required></div>
+          <button type="submit" id="submitBtn" class="btn btn-submit" disabled>提交報名申請</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="successSection" class="p-5 text-center" style="display:none;">
+      <i class="bi bi-patch-check-fill" style="font-size: 5rem; color: var(--gold);"></i>
+      <h2 class="text-white mt-3">報名資料已送出</h2>
+      <p class="text-white-50">感謝您的報名，請點擊下方按鈕加入官方 LINE 完成對帳。</p>
+      <a href="https://line.me/ti/p/@457nzegq" class="btn btn-submit rounded-pill px-5 mt-4">加入官方 LINE</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxOdrm10kKheQKqvHPb22ar_rBwTatiWxcRPtQE3VuHzbUyEklraw_FkbxcCUc0dl_Xcg/exec'; // ⚠️ 請更換為你的 GAS 部署網址
+
+  // 1. 網頁載入時即時查詢名額
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const select = document.getElementById('location');
+    fetch(scriptURL)
+      .then(response => response.json())
+      .then(remainingSeats => {
+        const options = select.options;
+        options[0].text = "請選擇地區";
+        for (let i = 1; i < options.length; i++) {
+          const locName = options[i].value;
+          if (remainingSeats.hasOwnProperty(locName)) {
+            const count = remainingSeats[locName];
+            if (count <= 0) {
+              options[i].text = locName + " (❌ 已額滿)";
+              options[i].disabled = true;
+            } else {
+              const fireIcon = count <= 10 ? "🔥 " : "";
+              options[i].text = locName + " (" + fireIcon + "剩餘 " + count + " 名)";
+            }
+          }
+        }
+      })
+      .catch(error => {
+        options[0].text = "請選擇地區 (連線異常)";
+        console.error('名額讀取失敗', error);
+      });
+  });
+
+  function toggleLogic() {
+    const promo = document.getElementById('promoCode').value.trim();
+    const bankId = document.getElementById('bankId').value.trim();
+    const isPromo = promo.length >= 6;
+    const targetOpacity = isPromo ? "0.3" : "1";
+    document.getElementById('priceSection').style.opacity = targetOpacity;
+    document.getElementById('bankLabel').style.opacity = targetOpacity;
+    document.getElementById('bankArea').style.opacity = targetOpacity;
+    document.getElementById('bankIdGroup').style.opacity = targetOpacity;
+    document.getElementById('submitBtn').disabled = !(isPromo || bankId.length === 5);
+  }
+
+  document.getElementById('luxusForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('loading').style.display = 'flex';
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch(scriptURL, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(res => {
+      document.getElementById('loading').style.display = 'none';
+      if (res.result === "SUCCESS") {
+        // 觸發 FB 轉換事件
+        fbq('track', 'CompleteRegistration', {
+          content_name: data.location,
+          value: 599,
+          currency: 'TWD'
+        });
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successSection').style.display = 'block';
+        window.scrollTo(0,0);
+      } else {
+        alert("提示：" + res.result);
+        location.reload(); // 若報名失敗（如剛好額滿），重新整理頁面更新名額
+      }
+    })
+    .catch(error => {
+      document.getElementById('loading').style.display = 'none';
+      alert("傳送失敗，請稍後再試！");
+    });
+  });
+</script>
+</body>
+</html>
