@@ -15,13 +15,16 @@
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
     
-    fbq('init', '你的PIXEL辨識碼'); // ⚠️ 填入你的 Pixel ID
+    fbq('init', '1889775941699134'); // 已填入你的 MP 辨識碼
     fbq('track', 'PageView');
   </script>
+  <noscript>
+    <img height="1" width="1" style="display:none" 
+         src="https://www.facebook.com/tr?id=1889775941699134&ev=PageView&noscript=1"/>
+  </noscript>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
-    /* UI 樣式部分 (維持原本 F1 檔案架構，不做變動) */
     :root { --bg-color: #121212; --card-bg: #1a1a1a; --gold: #c5a059; --text-main: #FFFFFF; }
     body { background-color: var(--bg-color); color: var(--text-main); font-family: "Noto Sans TC", sans-serif; padding: 20px 0; }
     .main-card { max-width: 600px; margin: auto; border: 1px solid #333; border-radius: 24px; background-color: var(--card-bg); box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; }
@@ -98,12 +101,12 @@
 </div>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbxOdrm10kKheQKqvHPb22ar_rBwTatiWxcRPtQE3VuHzbUyEklraw_FkbxcCUc0dl_Xcg/exec'; // ⚠️ 請更換為你的 GAS 部署網址
+  // ⚠️ 請更換為你的 GAS 部署網址
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxOdrm10kKheQKqvHPb22ar_rBwTatiWxcRPtQE3VuHzbUyEklraw_FkbxcCUc0dl_Xcg/exec'; 
 
-  // 1. 【F1 修正】即時查詢名額並強化快取處理
+  // 1. 即時查詢名額並強化快取處理
   window.addEventListener('DOMContentLoaded', (event) => {
     const select = document.getElementById('location');
-    // 加入時間戳記避免瀏覽器快取舊數據，確保名額即時扣除
     fetch(scriptURL + '?t=' + new Date().getTime())
       .then(response => response.json())
       .then(remainingSeats => {
@@ -125,11 +128,9 @@
       })
       .catch(error => {
         if(select.options[0]) select.options[0].text = "請選擇地區 (連線異常)";
-        console.error('名額讀取失敗', error);
       });
   });
 
-  // 2. 表單邏輯與提交 (維持不變)
   function toggleLogic() {
     const promo = document.getElementById('promoCode').value.trim();
     const bankId = document.getElementById('bankId').value.trim();
@@ -156,7 +157,7 @@
     .then(res => {
       document.getElementById('loading').style.display = 'none';
       if (res.result === "SUCCESS") {
-        // 觸發 FB 轉換事件 (維持不變)
+        // 【關鍵】發送轉換事件給 Meta Pixel
         fbq('track', 'CompleteRegistration', {
           content_name: data.location,
           value: 599,
@@ -167,7 +168,7 @@
         window.scrollTo(0,0);
       } else {
         alert("提示：" + res.result);
-        location.reload(); // 報名失敗則重新整理網頁
+        location.reload(); 
       }
     })
     .catch(error => {
